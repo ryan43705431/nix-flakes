@@ -1,0 +1,43 @@
+import { Theme } from "../theme.slint";
+
+export component TopBar inherits Rectangle {
+    in property <int> count: 0;
+
+    height: Theme.top-bar-h;
+    background: Theme.bg;
+
+    Text {
+        x: Theme.pad;
+        y: 0;
+        width: parent.width - Theme.pad * 2;
+        height: parent.height;
+        text: "LWE";
+        color: Theme.fg-mid;
+        font-family: Theme.font-mono;
+        font-size: Theme.fs-label;
+        letter-spacing: 2.8px;
+        vertical-alignment: center;
+    }
+
+    Text {
+        x: Theme.pad;
+        y: 0;
+        width: parent.width - Theme.pad * 2;
+        height: parent.height;
+        text: "\{root.count} 张";
+        color: Theme.fg-dim;
+        font-family: Theme.font-mono;
+        font-size: Theme.fs-label;
+        letter-spacing: Theme.ls-label;
+        horizontal-alignment: right;
+        vertical-alignment: center;
+    }
+
+    Rectangle {
+        x: 0;
+        y: parent.height - self.height;
+        width: parent.width;
+        height: 1px;
+        background: Theme.line;
+    }
+}

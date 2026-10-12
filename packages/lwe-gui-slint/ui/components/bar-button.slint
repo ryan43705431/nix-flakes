@@ -1,0 +1,53 @@
+import { Theme } from "../theme.slint";
+
+// 2px 圆角的器材感按钮：实心只用强调色一种，其余靠描边与字色
+export component BarButton inherits Rectangle {
+    in property <string> label: "按钮";
+    in property <bool> primary: true;
+    in property <bool> active: true;
+    callback clicked();
+
+    height: 30px;
+    border-radius: Theme.radius;
+    background: !active ? Theme.line : (primary ? Theme.accent : transparent);
+    border-width: primary ? 0px : 1px;
+    border-color: Theme.line-strong;
+    opacity: active ? 1 : 0.4;
+    animate background { duration: Theme.dur; }
+    animate opacity { duration: Theme.dur; }
+
+    Text {
+        x: 0;
+        y: 0;
+        width: 100%;
+        height: 100%;
+        text: root.label;
+        color: root.primary ? Theme.bg : Theme.fg-mid;
+        font-family: Theme.font-sans;
+        font-size: Theme.fs-row;
+        horizontal-alignment: center;
+        vertical-alignment: center;
+    }
+
+    ta := TouchArea {
+        x: 0;
+        y: 0;
+        width: 100%;
+        height: 100%;
+        enabled: root.active;
+        mouse-cursor: pointer;
+        clicked => { root.clicked(); }
+    }
+
+    states [
+        hover-primary when ta.has-hover && root.active && root.primary : {
+            background: Theme.accent-hi;
+        }
+        hover-ghost when ta.has-hover && root.active && !root.primary : {
+            background: Theme.bg-hover;
+        }
+        pressed when ta.pressed && root.active : {
+            background: root.primary ? Theme.accent-hi : Theme.bg-selected;
+        }
+    ]
+}

@@ -1,0 +1,82 @@
+import { Theme } from "../theme.slint";
+
+export component IndexRow inherits Rectangle {
+    in property <image> thumb;
+    in property <string> title: "";
+    in property <string> wallpaper-id: "";
+    in property <bool> selected: false;
+    callback picked();
+
+    height: Theme.row-h;
+    background: selected ? Theme.bg-selected : (ta.has-hover ? Theme.bg-hover : transparent);
+    animate background { duration: Theme.dur; }
+
+    // 选中：左侧 2px 琥珀竖线，不用圆角高亮块
+    Rectangle {
+        x: 0;
+        y: 0;
+        width: 2px;
+        height: parent.height;
+        background: Theme.accent;
+        visible: root.selected;
+    }
+
+    // 缩略图：未选中压到 45% 不透明度，让标题成为主角
+    Rectangle {
+        x: Theme.pad;
+        y: (parent.height - self.height) / 2;
+        width: Theme.thumb-w;
+        height: Theme.thumb-h;
+        border-radius: Theme.radius;
+        clip: true;
+        background: Theme.bg-hover;
+        opacity: root.selected ? 1 : 0.45;
+        animate opacity { duration: Theme.dur; }
+
+        Image {
+            x: 0;
+            y: 0;
+            width: 100%;
+            height: 100%;
+            source: root.thumb;
+            image-fit: cover;
+        }
+    }
+
+    VerticalLayout {
+        x: Theme.pad + Theme.thumb-w + 16px;
+        y: 0;
+        width: parent.width - self.x - Theme.pad;
+        height: parent.height;
+        alignment: center;
+        spacing: 3px;
+
+        Text {
+            vertical-stretch: 0;
+            text: root.title;
+            color: root.selected ? Theme.fg : Theme.fg-mid;
+            font-family: Theme.font-sans;
+            font-size: Theme.fs-row;
+            overflow: elide;
+        }
+
+        Text {
+            vertical-stretch: 0;
+            text: root.wallpaper-id;
+            color: Theme.fg-dim;
+            font-family: Theme.font-mono;
+            font-size: Theme.fs-micro;
+            letter-spacing: Theme.ls-micro;
+            overflow: elide;
+        }
+    }
+
+    ta := TouchArea {
+        x: 0;
+        y: 0;
+        width: 100%;
+        height: 100%;
+        mouse-cursor: pointer;
+        clicked => { root.picked(); }
+    }
+}

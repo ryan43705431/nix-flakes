@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=LWE Wallpaper Manager
+Name[zh_CN]=LWE 壁纸管理器
+Comment=Linux Wallpaper Engine 动态壁纸管理与应用
+Exec=lwe-gui-slint
+Terminal=false
+Categories=Graphics;Utility;
+Keywords=wallpaper;壁纸;

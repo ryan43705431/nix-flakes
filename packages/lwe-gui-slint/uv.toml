@@ -1,0 +1,5 @@
+# 使用 uv 托管的 CPython,不用 nix profile 里的 python。
+# nix python 自带 glibc 解释器(/nix/store/.../ld-linux-x86-64.so.2),绕过 nix-ld;
+# uv 托管的 CPython 解释器是 /lib64/ld-linux-x86-64.so.2,由 nix-ld 接管,
+# 从而让 pip 版 slint 找到 libwayland-client.so.0、libxkbcommon.so.0、libfontconfig 等共享库。
+python-preference = "only-managed"

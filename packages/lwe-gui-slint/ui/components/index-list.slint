@@ -1,0 +1,50 @@
+import { Theme } from "../theme.slint";
+import { WallpaperData } from "../wallpaper-data.slint";
+import { IndexRow } from "index-row.slint";
+
+export component IndexList inherits Rectangle {
+    in property <[WallpaperData]> wallpapers: [];
+    in property <int> current-index: -1;
+    callback selected(int);
+
+    background: Theme.bg-rail;
+
+    Text {
+        x: Theme.pad;
+        y: 22px;
+        text: "LIBRARY";
+        color: Theme.fg-dim;
+        font-family: Theme.font-mono;
+        font-size: Theme.fs-micro;
+        letter-spacing: Theme.ls-label;
+    }
+
+    fl := Flickable {
+        x: 0;
+        y: 44px;
+        width: parent.width;
+        height: parent.height - self.y;
+        content-width: self.width;
+        content-height: inner.preferred-height;
+
+        inner := VerticalLayout {
+            for wp[i] in root.wallpapers : IndexRow {
+                thumb: wp.thumb;
+                title: wp.title;
+                wallpaper-id: wp.id;
+                selected: i == root.current-index;
+                picked => { root.selected(i); }
+            }
+        }
+    }
+
+    // 自绘细滚动条，避免 std-widgets ScrollView 的默认外观
+    Rectangle {
+        x: parent.width - 5px;
+        width: 2px;
+        y: fl.y + (0px - fl.content-y) / max(fl.content-height, 1px) * fl.height;
+        height: (fl.height / max(fl.content-height, 1px)) * fl.height;
+        background: Theme.line-strong;
+        visible: fl.content-height > fl.height;
+    }
+}

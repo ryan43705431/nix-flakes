@@ -1,0 +1,16 @@
+[project]
+name = "lwe-gui-slint"
+version = "0.1.0"
+description = "Linux Wallpaper Engine visual manager (Python + Slint)"
+requires-python = ">=3.13"
+dependencies = ["slint>=1.18.1b1"]
+
+[project.scripts]
+lwe-gui-slint = "lwe_gui_slint.main:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/lwe_gui_slint"]

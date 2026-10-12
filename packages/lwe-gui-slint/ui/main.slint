@@ -1,0 +1,69 @@
+import { Theme } from "theme.slint";
+import { WallpaperData } from "wallpaper-data.slint";
+import { TopBar } from "components/top-bar.slint";
+import { IndexList } from "components/index-list.slint";
+import { InfoBar } from "components/info-bar.slint";
+
+export component AppWindow inherits Window {
+    title: "LWE Wallpaper Manager";
+    // 平铺窗口管理器会自己决定尺寸，这几个值只在浮动式 WM 下作为初值
+    preferred-width: 760px;
+    preferred-height: 620px;
+    min-width: 420px;
+    min-height: 320px;
+    background: Theme.bg;
+
+    in-out property <[WallpaperData]> wallpapers: [];
+    in-out property <int> current-index: -1;
+    in-out property <string> title-text: "";
+    in-out property <string> id-text: "";
+    in-out property <string> type-text: "";
+    in-out property <string> status: "就绪";
+    in-out property <string> status-kind: "idle";
+    in-out property <int> fps: 30;
+    in-out property <bool> busy: false;
+
+    callback select(int);
+    callback apply();
+    callback stop();
+    callback fps-changed(int);
+
+    // 注意：Window 里的组件实例必须显式给 x/y，
+    // 否则 Slint 会按父容器居中放置，而不是默认到 0。
+    TopBar {
+        x: 0;
+        y: 0;
+        width: parent.width;
+        count: root.wallpapers.length;
+    }
+
+    // 列表占满顶栏与底栏之间的全部空间
+    IndexList {
+        x: 0;
+        y: Theme.top-bar-h;
+        width: parent.width;
+        height: parent.height - self.y - Theme.info-bar-h;
+        wallpapers: root.wallpapers;
+        current-index: root.current-index;
+        selected(i) => { root.select(i); }
+    }
+
+    InfoBar {
+        x: 0;
+        y: parent.height - self.height;
+        width: parent.width;
+        title-text: root.title-text;
+        id-text: root.id-text;
+        type-text: root.type-text;
+        kind-text: root.current-index >= 0 && root.current-index < root.wallpapers.length ? root.wallpapers[root.current-index].kind : "";
+        status: root.status;
+        status-kind: root.status-kind;
+        fps: root.fps;
+        busy: root.busy;
+        has-selection: root.current-index >= 0;
+        count: root.wallpapers.length;
+        apply-clicked => { root.apply(); }
+        stop-clicked => { root.stop(); }
+        fps-changed(v) => { root.fps-changed(round(v)); }
+    }
+}

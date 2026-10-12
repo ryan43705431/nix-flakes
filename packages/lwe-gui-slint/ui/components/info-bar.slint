@@ -1,0 +1,145 @@
+import { Theme } from "../theme.slint";
+import { BarButton } from "bar-button.slint";
+import { FineSlider } from "fine-slider.slint";
+
+export component InfoBar inherits Rectangle {
+    in property <string> title-text: "";
+    in property <string> id-text: "";
+    in property <string> type-text: "";
+    in property <string> kind-text: "";
+    in property <string> status: "";
+    in property <string> status-kind: "idle";
+    in property <int> fps: 30;
+    in property <bool> busy: false;
+    in property <bool> has-selection: false;
+    in property <int> count: 0;
+
+    callback apply-clicked();
+    callback stop-clicked();
+    callback fps-changed(int);
+
+    height: Theme.info-bar-h;
+    background: Theme.bg;
+
+    // 右侧控件组从右向左排布；Slint 的 BoxLayout 只在主轴上做 alignment，
+    // 交叉轴一律靠显式 y 定位，避免顶到上沿。
+    private property <length> gap: 24px;
+    private property <length> fps-w: 72px;
+    private property <length> slider-w: 200px;
+    private property <length> buttons-w: 152px;
+    private property <length> buttons-x: root.width - Theme.pad - buttons-w;
+    private property <length> slider-x: root.buttons-x - gap - slider-w;
+    private property <length> fps-x: root.slider-x - gap - fps-w;
+    private property <length> left-w: root.fps-x - gap - Theme.pad;
+
+    Rectangle {
+        x: 0;
+        y: 0;
+        width: parent.width;
+        height: 1px;
+        background: Theme.line;
+    }
+
+    // 左：标题 / 元信息 / 状态
+    VerticalLayout {
+        x: Theme.pad;
+        y: 0;
+        width: root.left-w;
+        height: parent.height;
+        alignment: center;
+        spacing: 5px;
+
+        Text {
+            vertical-stretch: 0;
+            text: root.has-selection ? root.title-text : "未选择壁纸";
+            color: root.has-selection ? Theme.fg : Theme.fg-mid;
+            font-family: Theme.font-sans;
+            font-size: Theme.fs-title;
+            font-weight: 500;
+            overflow: elide;
+        }
+
+        Text {
+            vertical-stretch: 0;
+            text: root.has-selection
+                ? root.id-text + "  ·  " + root.type-text + "  ·  " + root.kind-text
+                : "\{root.count} 张壁纸  ·  点击列表中的壁纸选择";
+            color: Theme.fg-dim;
+            font-family: Theme.font-mono;
+            font-size: Theme.fs-micro;
+            letter-spacing: Theme.ls-unit;
+            overflow: elide;
+        }
+
+        Text {
+            vertical-stretch: 0;
+            text: root.status;
+            color: root.status-kind == "ok" ? Theme.ok : (root.status-kind == "error" ? Theme.danger : Theme.fg-dim);
+            font-family: Theme.font-sans;
+            font-size: Theme.fs-label;
+            overflow: elide;
+        }
+    }
+
+    // 右：帧率读数
+    VerticalLayout {
+        x: root.fps-x;
+        y: 0;
+        width: root.fps-w;
+        height: parent.height;
+        alignment: center;
+        spacing: 2px;
+
+        Text {
+            vertical-stretch: 0;
+            text: "FPS";
+            color: Theme.fg-dim;
+            font-family: Theme.font-mono;
+            font-size: Theme.fs-micro;
+            letter-spacing: Theme.ls-label;
+        }
+
+        Text {
+            vertical-stretch: 0;
+            text: root.fps < 100 ? "0" + root.fps : root.fps;
+            color: Theme.accent;
+            font-family: Theme.font-mono;
+            font-size: Theme.fs-number;
+            font-weight: 600;
+        }
+    }
+
+    FineSlider {
+        x: root.slider-x;
+        y: (parent.height - self.height) / 2;
+        width: root.slider-w;
+        value: root.fps;
+        minimum: 1;
+        maximum: 120;
+        changed(v) => { root.fps-changed(round(v)); }
+    }
+
+    HorizontalLayout {
+        x: root.buttons-x;
+        y: (parent.height - self.height) / 2;
+        width: root.buttons-w;
+        height: 30px;
+        spacing: 8px;
+
+        BarButton {
+            label: root.busy ? "应用中" : "应用";
+            primary: true;
+            active: !root.busy && root.has-selection;
+            width: 72px;
+            clicked => { root.apply-clicked(); }
+        }
+
+        BarButton {
+            label: "停止";
+            primary: false;
+            active: root.has-selection;
+            width: 72px;
+            clicked => { root.stop-clicked(); }
+        }
+    }
+}
