@@ -11,3 +11,6 @@ __pycache__/
 # 编辑器
 .direnv/
 *.swp
+
+# Rust 构建产物（sodam 等源码型包）
+target/

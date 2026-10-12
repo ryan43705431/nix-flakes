@@ -7,6 +7,11 @@ ryan 的个人 Nix 包集合。仓库自身是 flake，输出 `packages.<system>
 | 包 | 说明 |
 | --- | --- |
 | `lwe-gui-slint` | Linux Wallpaper Engine 壁纸管理器（Python + Slint） |
+| `sodam` | 汽水音乐第三方客户端（GPUI + Rust，源码 vendor 在本目录，AGPL-3.0-or-later） |
+
+> `sodam` 的上游源码是 clone 后裁剪放在 `packages/sodam`（去掉 `.git`、`docs/`），
+> 版本与来源记在同目录 `UPSTREAM`；更新用消费方仓库里的 `sodam-update`。
+> 构建需要能访问 GitHub 镜像：`Cargo.lock` 里 5 个 git 依赖经 `gh.acmsz.top` 重写抓取。
 
 ## 使用
 
