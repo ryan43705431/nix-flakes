@@ -12,6 +12,9 @@
   mesa,
   fontconfig,
   freetype,
+  # 只在运行时 dlopen、不进 DT_NEEDED 的库：winit 的 wayland 后端与 Skia 的 GL surface
+  wayland,
+  libGL,
   # 运行时经 PATH 调用的外部命令
   ffmpeg,
   linux-wallpaperengine,
@@ -86,6 +89,11 @@ python3.pkgs.buildPythonApplication {
   makeWrapperArgs = [
     "--prefix PATH : ${lib.makeBinPath [ linux-wallpaperengine ffmpeg procps ]}"
     "--set LWE_UI_DIR ${placeholder "out"}/share/lwe-gui-slint/ui"
+    # libwayland-client / libEGL / mesa 驱动是 dlopen 进来的，不在 slint.abi3.so 的
+    # DT_NEEDED 里，autoPatchelfHook 的 RPATH 也就不含它们。缺了这行 winit 建不出
+    # wayland 事件循环，slint 退回 linuxkms 后端并报
+    # 「presenting framebuffer on screen: Permission denied (os error 13)」。
+    "--prefix LD_LIBRARY_PATH : ${lib.makeLibraryPath [ wayland libGL mesa ]}"
   ];
 
   doCheck = false;
